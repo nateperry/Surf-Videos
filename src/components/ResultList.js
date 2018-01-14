@@ -17,6 +17,9 @@ class ResultList extends Component {
 
     return (
       <div className="result-list">
+        <header className="result-list__header">
+          <span>Showing {items.length} out of {this.props.total}</span>
+        </header>
         {_map(items, (item, i) => {
           return (
             <VideoResult

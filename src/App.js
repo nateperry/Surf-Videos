@@ -23,12 +23,16 @@ class App extends Component {
     this.debouncedSearch = _debounce(this.search.bind(this), 500);
     this.onResultsLoaded = this.onResultsLoaded.bind(this);
     this.onSearchError = this.onSearchError.bind(this);
-    this.onScroll = this.onScroll.bind(this);
+    this.debouncedScroll = _debounce(this.onScroll.bind(this), 500);
     this.onQueryChange = this.onQueryChange.bind(this);
   }
 
   componentDidMount() {
-    document.addEventListener('scroll', _debounce(this.onScroll, 500));
+    document.addEventListener('scroll', this.debouncedScroll);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('scroll')
   }
 
   reset() {
@@ -51,15 +55,18 @@ class App extends Component {
       const cache = this.state.resultsCache[q];
       if (cache.items.length >= cache.totalItems) {
         // nothing else to request, so do nothing;
-        if (this.state.currentItems === cache.items) {
+        if (this.state.currentItems !== cache) {
           // ensure that we are looking it the correct list of items based on the current query
-          this.setState({currentItems: cache.items});
+          this.setState({currentItems: cache});
         }
         return;
       }
 
-      tempState['currentItems'] = cache.items;
+      tempState['currentItems'] = cache;
       url += `&pageToken=${cache.nextPageToken}`
+    } else {
+      // brand new request, so clear the list while requesting
+      tempState['currentItems'] = null;
     }
     this.setState(tempState, () => {
       fetch(url)
@@ -97,7 +104,7 @@ class App extends Component {
     }
     this.setState({
       requesting: false,
-      currentItems: result.items,
+      currentItems: result,
       resultsCache: newCache
     });
   }
@@ -109,11 +116,11 @@ class App extends Component {
     });
   }
 
-  onScroll(e) {
+  onScroll() {
     const scrollPos = window.scrollY,
-      docHeight = document.body.scrollHeight,
+      docHeight = document.documentElement.scrollHeight,
       range = 300;
-    if ((docHeight - range) > scrollPos) {
+    if ((window.innerHeight + scrollPos) > (docHeight - range)) {
       this.debouncedSearch();
     }
   }
@@ -134,7 +141,8 @@ class App extends Component {
         </header>
         {this.state.currentItems ? (
           <ResultList
-            items={this.state.currentItems}
+            items={this.state.currentItems.items}
+            total={this.state.currentItems.totalItems}
           />
         ) : null}
         {this.state.requesting ? <div className="loader"/> : null }
