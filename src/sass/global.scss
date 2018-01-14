@@ -1,44 +1,26 @@
+$color-blue: #4ca8a7;
+$breakpoint-tablet-min: "min-width: 620px";
+
+$header-height: 80px;
+
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
 body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
 }
 
-.result-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  width: 100%;
+.app {
+  padding-top: 10 + $header-height;
 }
 
-.result-list--loading {
-  background: blue;
-  height: 100px;
-
-  &:after {
-    content: 'Loading...';
-    display: block;
-    text-align: center;
-  }
-}
-
-.result-list--empty {
-  text-align: center;
-}
-
-.video-result {
-  height: 90px;
-  position: relative;
-  width: 120px;
-}
-
-.video-result__thumbnail {
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: 120px 90px;
-  bottom: 0;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-}
+@import "header";
+@import "result-list";
+@import "video-result";

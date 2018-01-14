@@ -1,0 +1,16 @@
+.app-header {
+  align-items: center;
+  background: $color-blue;
+  color: white;
+  display: flex;
+  height: $header-height;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1500;
+}
+
+.app-header__title {
+  margin: 0;
+}

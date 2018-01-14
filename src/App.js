@@ -39,18 +39,18 @@ class App extends Component {
 
     if (_has(this.state.resultsCache, q)) {
       this.setState({
-        currentItems: this.state.resultsCache[q]
+        currentItems: this.state.resultsCache[q].items
       });
       return;
     }
 
     this.setState({requesting: true}, () => {
       const urlBase = 'https://www.googleapis.com/youtube/v3/search';
-      fetch(`${urlBase}?key=${this.props.apiKey}&part=snippet&type=video&q=${q}`)
+      fetch(`${urlBase}?key=${this.props.apiKey}&part=snippet&type=video&q=${'surf ' + q}`)
         .then(response => {
           if (response.ok && response.status === 200) {
             response.json().then(results => {
-              this.onResultsLoaded(results.items, q);
+              this.onResultsLoaded(results, q);
             });
           } else {
             this.onSearchError();
@@ -74,7 +74,7 @@ class App extends Component {
     }
     this.setState({
       requesting: false,
-      currentItems: results,
+      currentItems: results.items,
       resultsCache: newCache
     });
   }
@@ -92,12 +92,14 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
-        <h1>Surf Videos</h1>
-        <SearchInput
-          query={this.state.query}
-          onQueryChange={this.onQueryChange}
-        />
+      <div className="app">
+        <header className="app-header">
+          <h1 className="app-header__title">Surf Videos</h1>
+          <SearchInput
+            query={this.state.query}
+            onQueryChange={this.onQueryChange}
+          />
+        </header>
         {this.state.currentItems ? (
           <ResultList
             items={this.state.currentItems}
