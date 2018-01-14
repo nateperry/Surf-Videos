@@ -18,7 +18,19 @@ body {
 }
 
 .app {
+  padding-bottom: 150px;
   padding-top: 10 + $header-height;
+}
+
+.loader {
+  background: blue;
+  height: 100px;
+
+  &:after {
+    content: 'Loading...';
+    display: block;
+    text-align: center;
+  }
 }
 
 @import "header";

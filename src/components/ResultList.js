@@ -5,12 +5,6 @@ import _map from 'lodash/map';
 
 class ResultList extends Component {
   render() {
-    if (this.props.loading) {
-      return (
-        <div className="result-list--loading"/>
-      );
-    }
-
     const items = this.props.items || [];
 
     if (items.length === 0) {

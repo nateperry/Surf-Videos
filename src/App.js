@@ -1,8 +1,10 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import SearchInput from './components/SearchInput';
 import ResultList from './components/ResultList';
 import _assignIn from 'lodash/assignIn';
+import _concat from 'lodash/concat';
 import _debounce from 'lodash/debounce';
+import _get from 'lodash/get';
 import _has from 'lodash/has';
 import _isEmpty from 'lodash/isEmpty';
 
@@ -17,10 +19,16 @@ class App extends Component {
       resultsCache: {}
     };
 
-    this.debouncedSearchQuery = _debounce(this.searchQuery.bind(this), 500);
+    this.reset = this.reset.bind(this);
+    this.debouncedSearch = _debounce(this.search.bind(this), 500);
     this.onResultsLoaded = this.onResultsLoaded.bind(this);
     this.onSearchError = this.onSearchError.bind(this);
+    this.onScroll = this.onScroll.bind(this);
     this.onQueryChange = this.onQueryChange.bind(this);
+  }
+
+  componentDidMount() {
+    document.addEventListener('scroll', _debounce(this.onScroll, 500));
   }
 
   reset() {
@@ -30,23 +38,31 @@ class App extends Component {
     });
   }
 
-  searchQuery() {
+  search() {
     const q = this.state.query;
     if (_isEmpty(q.trim())) {
       this.reset();
       return;
     }
-
+    let url = `https://www.googleapis.com/youtube/v3/search?`
+      + `key=${this.props.apiKey}&part=snippet&type=video&maxResults=10&q=${'surf ' + q}`;
+    const tempState = {requesting: true};
     if (_has(this.state.resultsCache, q)) {
-      this.setState({
-        currentItems: this.state.resultsCache[q].items
-      });
-      return;
-    }
+      const cache = this.state.resultsCache[q];
+      if (cache.items.length >= cache.totalItems) {
+        // nothing else to request, so do nothing;
+        if (this.state.currentItems === cache.items) {
+          // ensure that we are looking it the correct list of items based on the current query
+          this.setState({currentItems: cache.items});
+        }
+        return;
+      }
 
-    this.setState({requesting: true}, () => {
-      const urlBase = 'https://www.googleapis.com/youtube/v3/search';
-      fetch(`${urlBase}?key=${this.props.apiKey}&part=snippet&type=video&q=${'surf ' + q}`)
+      tempState['currentItems'] = cache.items;
+      url += `&pageToken=${cache.nextPageToken}`
+    }
+    this.setState(tempState, () => {
+      fetch(url)
         .then(response => {
           if (response.ok && response.status === 200) {
             response.json().then(results => {
@@ -60,8 +76,15 @@ class App extends Component {
   }
 
   onResultsLoaded(results, query) {
+    const currentCache = _get(this.state.resultsCache, query, null);
+    const result = {
+      items: currentCache ? _concat(currentCache.items, results.items) : results.items,
+      nextPageToken: results.nextPageToken,
+      totalItems: results.pageInfo.totalResults
+    };
+
     const newCache = _assignIn({}, this.state.resultsCache, {
-      [query]: results
+      [query]: result
     });
 
     // check that this request is still the current query
@@ -74,7 +97,7 @@ class App extends Component {
     }
     this.setState({
       requesting: false,
-      currentItems: results.items,
+      currentItems: result.items,
       resultsCache: newCache
     });
   }
@@ -86,8 +109,17 @@ class App extends Component {
     });
   }
 
+  onScroll(e) {
+    const scrollPos = window.scrollY,
+      docHeight = document.body.scrollHeight,
+      range = 300;
+    if ((docHeight - range) > scrollPos) {
+      this.debouncedSearch();
+    }
+  }
+
   onQueryChange(query) {
-    this.setState({query}, this.debouncedSearchQuery);
+    this.setState({query}, this.search);
   }
 
   render() {
@@ -103,9 +135,9 @@ class App extends Component {
         {this.state.currentItems ? (
           <ResultList
             items={this.state.currentItems}
-            loading={this.state.requesting}
           />
         ) : null}
+        {this.state.requesting ? <div className="loader"/> : null }
       </div>
     );
   }
