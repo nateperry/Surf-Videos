@@ -3,7 +3,7 @@
 ### Sass ###
 .sass-cache/
 *.css.map
-/src/styles/*.css
+/src/sass/*.css
 
 ### Node ###
 # Logs
