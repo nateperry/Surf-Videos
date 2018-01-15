@@ -21,7 +21,8 @@ class App extends Component {
       query: '',
       requesting: false,
       currentItems: null,
-      resultsCache: {}
+      resultsCache: {},
+      errors: false
     };
 
     this.reset = this.reset.bind(this);
@@ -79,7 +80,7 @@ class App extends Component {
           if (response.ok && response.status === 200) {
             response.json().then(results => {
               this.onResultsLoaded(results, q);
-            });
+            }, this.onSearchError);
           } else {
             this.onSearchError();
           }
@@ -103,21 +104,23 @@ class App extends Component {
     // as it may have changed while loading
     if (query !== this.state.query) {
       this.setState({
-        resultsCache: newCache
+        resultsCache: newCache,
+        errors: false
       });
       return;
     }
     this.setState({
       requesting: false,
       currentItems: result,
-      resultsCache: newCache
+      resultsCache: newCache,
+      errors: false
     });
   }
 
   onSearchError() {
     this.setState({
       requesting: false,
-      errors: 'An Error occurred'
+      errors: true
     });
   }
 
@@ -157,6 +160,23 @@ class App extends Component {
             );
           }}/>
           <Route path="/" render={(routeProps) => {
+            if (this.state.errors) {
+              return (
+                <div className="app-error">
+                  <h3>Uh oh! This page is unavailable. Please try searching above for some cool surf videos.</h3>
+                </div>
+              );
+            }
+
+            if (!this.state.currentItems && !this.state.query) {
+              return (
+                <div className="app-welcome">
+                  <h3>Welcome!</h3>
+                  <p>Use the input above to search for some awesome surf videos.</p>
+                </div>
+              );
+            }
+
             return (
               <Home
                 {...routeProps}

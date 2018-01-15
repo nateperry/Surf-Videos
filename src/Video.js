@@ -7,7 +7,8 @@ class Video extends Component {
 
     this.state = {
       loading: false,
-      video: null
+      video: null,
+      errors: false
     };
 
     this.requestVideo = this.requestVideo.bind(this);
@@ -21,15 +22,16 @@ class Video extends Component {
 
   requestVideo() {
     const parts = ['contentDetails', 'player', 'snippet'].join(',');
-
-
-
     let url = `https://www.googleapis.com/youtube/v3/videos?key=${this.props.apiKey}&id=${this.props.videoId}&part=${parts}`;
     fetch(url).then(response => {
         if (response.ok && response.status === 200) {
           response.json().then(results => {
-            this.onVideoLoaded(results);
-          });
+            if (results.items.length === 1) {
+              this.onVideoLoaded(results);
+            } else {
+              this.onError();
+            }
+          }, this.onError);
         } else {
           this.onError();
         }
@@ -39,15 +41,27 @@ class Video extends Component {
   onVideoLoaded(response) {
     this.setState({
       loading: false,
-      video: response.items[0]
+      video: response.items[0],
+      errors: false
     });
   }
 
   onError() {
-    // TODO
+    this.setState({
+      loading: false,
+      errors: true
+    });
   }
 
   render() {
+    if (this.state.errors) {
+      return (
+        <div className="app-error">
+          <h3>Uh oh! This page is unavailable. Please try searching above for some cool surf videos.</h3>
+        </div>
+      );
+    }
+
     return (
       <div className="video">
         {this.state.loading || !this.state.video ? (
