@@ -5,10 +5,17 @@ $video-width-tablet: 220px;
 $video-height-tablet: 165px;
 
 .video-result {
+  color: $color-black;
   position: relative;
   display: flex;
   margin: 0 0 10px;
+  text-decoration: none;
   width: 100%;
+
+  &:hover,
+  &:focus {
+    background: rgba($color-gray-light, 0.2);
+  }
 }
 
 .video-result__thumbnail {

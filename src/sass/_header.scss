@@ -1,7 +1,8 @@
 .app-header {
   align-items: center;
-  background: $color-blue;
-  color: white;
+  background: $color-green;
+  border-bottom: 2px solid darken($color-green, 6%);
+  color: $color-white;
   display: flex;
   height: $header-height;
   left: 0;

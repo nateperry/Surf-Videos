@@ -19,6 +19,7 @@ class SearchInput extends Component {
           type="text"
           value={this.props.query}
           onChange={this.onChange}
+          placeholder="Search for Surf videos..."
         />
       </div>
     )

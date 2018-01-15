@@ -1,0 +1,25 @@
+.video {
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 40px 20px;
+}
+
+.video__title {
+  margin-bottom: 4px;
+}
+
+.video__meta {
+  color: $color-gray-light;
+  font-size: 0.8rem;
+}
+
+.video__player {
+  height: 270px;
+  margin-bottom: 40px;
+
+  iframe {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+  }
+}

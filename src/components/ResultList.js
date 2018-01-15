@@ -28,6 +28,11 @@ class ResultList extends Component {
             />
           )
         })}
+        {items.length < this.props.total ? (
+          <footer className="result-list__footer">
+            <span>Scroll down to see more results</span>
+          </footer>
+        ) : null}
       </div>
     )
   }

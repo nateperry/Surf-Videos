@@ -1,4 +1,8 @@
-$color-blue: #4ca8a7;
+$color-green: #16a085;
+$color-black: #222;
+$color-white: #ecf0f1;
+$color-gray-light: #95a5a6;
+
 $breakpoint-tablet-min: "min-width: 620px";
 
 $header-height: 80px;
@@ -12,6 +16,7 @@ html {
 }
 
 body {
+  background: $color-white;
   margin: 0;
   padding: 0;
   font-family: sans-serif;
@@ -35,4 +40,5 @@ body {
 
 @import "header";
 @import "result-list";
+@import "video-page";
 @import "video-result";

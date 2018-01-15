@@ -1,12 +1,17 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import {Route, Switch} from 'react-router-dom';
+import Home from './Home';
+import Video from './Video';
 import SearchInput from './components/SearchInput';
-import ResultList from './components/ResultList';
+import _debounce from 'lodash/debounce';
+import _isEmpty from 'lodash/isEmpty';
+import _get from 'lodash/get';
 import _assignIn from 'lodash/assignIn';
 import _concat from 'lodash/concat';
-import _debounce from 'lodash/debounce';
-import _get from 'lodash/get';
 import _has from 'lodash/has';
-import _isEmpty from 'lodash/isEmpty';
+
+const API_KEY = 'AIzaSyAfYOKAPR8h7CbO39tkjMGI_uXkX0taK4s';
 
 class App extends Component {
   constructor(props) {
@@ -32,7 +37,7 @@ class App extends Component {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('scroll')
+    document.removeEventListener('scroll', this.debouncedScroll);
   }
 
   reset() {
@@ -49,7 +54,7 @@ class App extends Component {
       return;
     }
     let url = `https://www.googleapis.com/youtube/v3/search?`
-      + `key=${this.props.apiKey}&part=snippet&type=video&maxResults=10&q=${'surf ' + q}`;
+      + `key=${API_KEY}&part=snippet&type=video&maxResults=10&q=${'surf ' + q}`;
     const tempState = {requesting: true};
     if (_has(this.state.resultsCache, q)) {
       const cache = this.state.resultsCache[q];
@@ -121,12 +126,15 @@ class App extends Component {
       docHeight = document.documentElement.scrollHeight,
       range = 300;
     if ((window.innerHeight + scrollPos) > (docHeight - range)) {
-      this.debouncedSearch();
+      this.search();
     }
   }
 
   onQueryChange(query) {
-    this.setState({query}, this.search);
+    if (this.context.router.route.location.pathname !== '/') {
+      this.context.router.history.push('/');
+    }
+    this.setState({query, currentItems: null}, this.debouncedSearch);
   }
 
   render() {
@@ -139,16 +147,34 @@ class App extends Component {
             onQueryChange={this.onQueryChange}
           />
         </header>
-        {this.state.currentItems ? (
-          <ResultList
-            items={this.state.currentItems.items}
-            total={this.state.currentItems.totalItems}
-          />
-        ) : null}
-        {this.state.requesting ? <div className="loader"/> : null }
+        <Switch>
+          <Route path="/watch/:videoId" render={(routeProps) => {
+            return (
+              <Video
+                videoId={routeProps.match.params.videoId}
+                apiKey={API_KEY}
+              />
+            );
+          }}/>
+          <Route path="/" render={(routeProps) => {
+            return (
+              <Home
+                {...routeProps}
+                currentItems={this.state.currentItems}
+                requesting={this.state.requesting}
+              />
+            );
+          }}/>
+        </Switch>
       </div>
     );
   }
 }
+
+App.contextTypes = {
+  router: PropTypes.shape({
+    history: PropTypes.object.isRequired
+  })
+};
 
 export default App;
