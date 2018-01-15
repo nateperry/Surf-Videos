@@ -5,7 +5,7 @@ $color-gray-light: #95a5a6;
 
 $breakpoint-tablet-min: "min-width: 620px";
 
-$header-height: 80px;
+$header-height: 85px;
 
 html {
   box-sizing: border-box;
@@ -17,6 +17,7 @@ html {
 
 body {
   background: $color-white;
+  font-size: 16px;
   color: $color-black;
   margin: 0;
   padding: 0;
@@ -38,18 +39,9 @@ body {
   text-align: center;
 }
 
-.loader {
-  background: blue;
-  height: 100px;
-
-  &:after {
-    content: 'Loading...';
-    display: block;
-    text-align: center;
-  }
-}
-
+@import "loader";
 @import "header";
+@import "search";
 @import "result-list";
 @import "video-page";
 @import "video-result";

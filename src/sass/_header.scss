@@ -1,9 +1,7 @@
 .app-header {
-  align-items: center;
   background: $color-green;
   border-bottom: 2px solid darken($color-green, 6%);
   color: $color-white;
-  display: flex;
   height: $header-height;
   left: 0;
   position: fixed;
@@ -13,5 +11,15 @@
 }
 
 .app-header__title {
-  margin: 0;
+  margin: 5px 0;
+  font-size: 1.5rem;
+  padding: 0 10px;
+}
+
+@media screen and ($breakpoint-tablet-min) {
+  .app-header {
+    align-items: center;
+    display: flex;
+    height: $header-height;
+  }
 }

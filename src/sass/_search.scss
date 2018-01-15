@@ -1,0 +1,14 @@
+.search {
+  flex-grow: 2;
+  padding: 0 10px;
+
+  input {
+    background: $color-white;
+    color: $color-black;
+    border: 2px solid darken($color-green, 5%);
+    border-radius: 16px;
+    font-size: 1.25rem;
+    padding: 4px 18px;
+    width: 100%;
+  }
+}
